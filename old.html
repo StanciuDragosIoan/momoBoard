@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App (Jira Board)</title>
+  <link rel="stylesheet" href="./assets/old.css">
+</head>
+<body>
+
+  <div class="board">
+    <!-- To Do Column -->
+    <div class="column" id="todo">
+      <h2>To Do</h2>
+      <div class="task" draggable="true" ondragstart="drag(event)" id="task-1">
+        <p><span>Task 1</span></p>
+        <p class="started"></p>
+      </div>
+      <div class="task" draggable="true" ondragstart="drag(event)" id="task-2">
+        <p><span>Task 2</span></p>
+        <p class="started"></p>
+      </div>
+    </div>
+
+    <!-- In Progress Column -->
+    <div class="column" id="in-progress" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h2>In Progress</h2>
+    </div>
+
+    <!-- Done Column -->
+    <div class="column" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h2>Done</h2>
+    </div>
+  </div>
+
+  <!-- Modal for Adding New Task -->
+  <div class="modal-overlay" onclick="closeModal()"></div>
+  <div class="modal">
+    <h2>Create New Task</h2>
+    <input type="text" id="taskTitle" placeholder="Title" required>
+    <textarea id="taskDescription" placeholder="Description" required></textarea>
+    <button onclick="addNewTask()">Add Task</button>
+    <button onclick="closeModal()">Close</button>
+  </div>
+
+  <button class="open-modal" onclick="openModal()">+ Add Task</button>
+
+  <script src="./assets/old.js"></script>
+</body>
+</html>

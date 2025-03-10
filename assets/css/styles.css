@@ -1,0 +1,202 @@
+/* Define CSS Custom Properties (Variables) */
+:root {
+  --red: #ff6b6b;
+  --orange: #feca57;
+  --green: #1dd1a1;
+  --dark-green: #62726e;
+  --white: #ffffff;
+  --light-gray: #f4f7fc;
+  --dark-gray: #333;
+  --light-gray-2: #555;
+  --hover-red: #ff3b3b;
+  --box-shadow: rgba(0, 0, 0, 0.2);
+  --hover-box-shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Body Styles */
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: var(--light-gray);
+  margin: 0;
+}
+
+.board {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1500px;
+  flex-wrap: wrap;
+}
+
+/* Column Styles */
+.column {
+  width: 30%;
+  padding: 15px;
+  border-radius: 10px;
+  min-height: 400px;
+  box-sizing: border-box;
+  color: var(--white);
+  font-weight: bold;
+  text-align: center;
+  transition: 0.3s ease-in-out;
+  box-shadow: 3px 3px 10px var(--box-shadow);
+  flex: 1 1 30%;
+}
+
+/* Column Colors */
+#todo {
+  background-color: var(--red);
+}
+
+#in-progress {
+  background-color: var(--orange);
+}
+
+#done {
+  background-color: var(--green);
+}
+
+#archived {
+  background-color: var(--dark-green);
+}
+
+/* Task Styles */
+.task {
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  background-color: var(--white);
+  color: var(--dark-gray);
+  font-weight: bold;
+  cursor: grab;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 2px 2px 5px var(--box-shadow);
+}
+
+#archived {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#archived h2 {
+  font-size: 1.5em;
+}
+
+#archived .container {
+  height: 95%;
+  gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.task:hover {
+  transform: scale(1.05);
+  box-shadow: 4px 4px 8px var(--hover-box-shadow);
+}
+
+.task p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.task .time {
+  font-style: italic;
+  color: var(--light-gray-2);
+  font-size: 12px;
+}
+
+/* Modal Styles */
+.open-modal {
+  padding: 12px 15px;
+  background-color: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  width: 15rem;
+  height: 3rem;
+  margin: auto;
+  display: block;
+  margin: 2rem auto;
+}
+
+.open-modal:hover {
+  background-color: var(--hover-red);
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--white);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+  z-index: 1000;
+  display: none;
+}
+
+#taskTitle {
+  padding: 0.5rem;
+  outline: none;
+  border-radius: 15px;
+}
+
+#taskDescription {
+  padding: 0.5rem;
+  outline: none;
+  border-radius: 15px;
+  margin: 1rem auto;
+}
+
+.input-add-btn,
+.close {
+  padding: 12px 15px;
+  background-color: var(--green);
+  border: none;
+  border-radius: 5px;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 14px;
+  width: 10rem;
+  margin-top: 1rem;
+}
+
+.close {
+  background-color: var(--hover-red);
+}
+
+.active {
+  display: block;
+}
+
+.modal h2 {
+  text-align: center;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive Layout */
+@media screen and (max-width: 768px) {
+  .column {
+      flex: 1 1 50%;
+  }
+
+  .open-modal {
+      width: auto;
+      min-width: 10rem;
+  }
+}

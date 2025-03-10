@@ -1,0 +1,191 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    background-color: #f4f7fc;
+    margin: 0;
+  }
+  
+  .board {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  }
+  
+  /* Column Styles */
+  .column {
+    width: 30%;
+    padding: 15px;
+    border-radius: 10px;
+    min-height: 400px;
+    box-sizing: border-box;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    transition: 0.3s ease-in-out;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    flex: 1 1 30%; /* Flex to allow resizing */
+  }
+  
+  .column h2 {
+    margin-bottom: 20px;
+  }
+  
+  /* Column Colors */
+  #todo {
+    background-color: #ff6b6b; /* Red */
+  }
+  
+  #in-progress {
+    background-color: #feca57; /* Orange */
+  }
+  
+  #done {
+    background-color: #1dd1a1; /* Green */
+  }
+  
+  /* Task Styles */
+  .task {
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    background-color: white;
+    color: #333;
+    font-weight: bold;
+    cursor: grab;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .task:hover {
+    transform: scale(1.05);
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .task p {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+  
+  .task .started {
+    font-style: italic;
+    color: #555;
+    font-size: 12px;
+  }
+  
+  /* Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 999;
+  }
+  
+  .modal-overlay.active {
+    display: block;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 400px;
+    z-index: 1000;
+    display: none;
+  }
+  
+  .modal.active {
+    display: block;
+    margin-top: 10px;
+  }
+  
+  input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  
+  button {
+    padding: 12px 15px;
+    background-color: #1dd1a1;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+  }
+  
+  button:hover {
+    background-color: #16a085;
+  }
+  
+  .open-modal {
+    padding: 12px 15px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    width: 15rem;
+    height:3rem;
+    margin-top: 20px;
+  }
+  
+  .open-modal:hover {
+    background-color: #ff3b3b;
+  }
+  
+  /* Responsive Layout */
+  @media screen and (max-width: 768px) {
+    .board {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .column {
+      width: 80%;
+      margin-bottom: 20px;
+    }
+  
+    .modal {
+      width: 90%;
+      max-width: 500px;
+    }
+  
+    .open-modal {
+      width: 80%;
+      margin-top: 20px;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .column {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  
+    input, textarea, button {
+      padding: 10px;
+      font-size: 14px;
+    }
+  }
+  
