@@ -28,58 +28,25 @@
     <div class="board">
         <div class="column" id="todo">
             <h2>To Do</h2>
-
-            <!-- task -->
-            <!-- <div class="task" draggable="true" ondragstart="drag(event)" id="task-1">
-                <p><span>Task 1</span></p>
-                <p class="started">Lorem ipsum dolor sit amet.</p>
-            </div> -->
-
-
+            <div id="tasksPlace"></div>
         </div>
 
-        <div class="column" id="in-progress">
+        <div class="column" id="in-progress" ondrop="drop(event)" ondragover="allowDrop(event)">
             <h2>In Progress</h2>
 
-            <!-- <div class="task" draggable="true" ondragstart="drag(event)" id="task-1">
-                <p><span>Task 1</span></p>
-                <p>Lorem ipsum dolor sit amet.</p>
-                <p class="time">Lorem ipsum dolor sit amet.</p>
-            </div> -->
+           
         </div>
 
-        <div class="column" id="done">
+        <div class="column" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
             <h2>Done</h2>
 
-            <!-- <div class="task" draggable="true" ondragstart="drag(event)" id="task-1">
-                <p><span>Task 1</span></p>
-                <p>Lorem ipsum dolor sit amet.</p>
-                <p class="time">started: 10/03/2025</p>
-            </div> -->
+          
         </div>
 
-        <div class="column" id="archived">
+        <div class="column" id="archived" ondrop="drop(event)" ondragover="allowDrop(event)">
             <h2>Archived</h2>
 
-            <!-- <div class="container">
-                <div class="task" draggable="true" ondragstart="drag(event)" id="task-1">
-                    <p><span>Task 1</span></p>
-                    <p>Lorem ipsum dolor sit amet.</p>
-                     <p class="time">started: 10/03/2025</p>
-                </div>
-
-                <div class="task" draggable="true" ondragstart="drag(event)" id="task-1">
-                    <p><span>Task 1</span></p>
-                    <p>Lorem ipsum dolor sit amet.</p>
-                     <p class="time">started: 10/03/2025</p>
-                </div>
-
-                <div class="task" draggable="true" ondragstart="drag(event)" id="task-1">
-                    <p><span>Task 1</span></p>
-                    <p>Lorem ipsum dolor sit amet.</p>
-                     <p class="time">started: 10/03/2025</p>
-                </div>
-            </div> -->
+         
 
 
         </div>
