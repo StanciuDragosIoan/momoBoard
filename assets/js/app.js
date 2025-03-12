@@ -3,7 +3,36 @@ const modalBtn = document.querySelector(
 );
 const closeBtn = document.querySelector(".close");
 
-const tasks = localStorage.getItem("tasksBoard") ? JSON.parse(localStorage.getItem("tasksBoard")) : [];
+const getTasks = async () => {
+  try {
+    const response = await fetch('https://small-services-back-ends.vercel.app/api/task', {
+      method: 'GET',  // Use GET method to fetch data
+      headers: {
+        'Content-Type': 'application/json',  // Ensure the server knows we are expecting JSON
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch tasks');
+    }
+
+    const   responseData = await response.json();  // Parse the JSON response
+
+    console.log('Tasks fetched successfully:',responseData);
+
+    const { data }  = responseData;
+
+    return data;
+  } catch (error) {
+    console.error('Error:', error.message);
+    return [];
+  }
+};
+
+// Call the function to
+
+
+// const tasks = localStorage.getItem("tasksBoard") ? JSON.parse(localStorage.getItem("tasksBoard")) : [];
 
 closeBtn.addEventListener("click", closeModal);
 
@@ -35,27 +64,57 @@ function isUniqueTitle(title) {
   }
   return true;
 }
-function addTask(){
-  const taskTitle = document.querySelector("#taskTitle").value;
-  const taskBody =  document.querySelector("#taskDescription").value;
-  const titleIsUnique = isUniqueTitle(taskTitle);
-  console.log(titleIsUnique);
-  if(!taskTitle || !taskBody || !titleIsUnique) {
-    //TODO improve error
-    alert("Please input something and make sure it's unique!");
-  } else {
-    tasks.push({title: taskTitle, body: taskBody});
-    localStorage.setItem("tasksBoard", JSON.stringify(tasks));
-    taskTitle.innerHTML="";
-    taskBody.innerHTML="";
+// function addTask(){
+//   const taskTitle = document.querySelector("#taskTitle").value;
+//   const taskBody =  document.querySelector("#taskDescription").value;
+//   const titleIsUnique = isUniqueTitle(taskTitle);
+//   console.log(titleIsUnique);
+//   if(!taskTitle || !taskBody || !titleIsUnique) {
+//     //TODO improve error
+//     alert("Please input something and make sure it's unique!");
+//   } else {
+//     tasks.push({title: taskTitle, description: taskBody});
+//     localStorage.setItem("tasksBoard", JSON.stringify(tasks));
+//     taskTitle.innerHTML="";
+//     taskBody.innerHTML="";
+//     displayTasks();
+//   }
+
+// }
+
+async function addTask() {
+  const task = {
+    title: "New Task",        // Your task title
+    description: "This is the description of the new task"  // Your task description
+  };
+
+  try {
+    const response = await fetch('https://small-services-back-ends.vercel.app/api/task', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',  // Ensure you're sending JSON
+      },
+      body: JSON.stringify(task),  // Convert the task object to a JSON string
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create task');
+    }
+
+    const data = await response.json();  // Parse the JSON response
     displayTasks();
+    console.log('Task created successfully:', data);
+  } catch (error) {
+    console.error('Error:', error.message);
   }
+};
 
-}
 
-function displayTasks(){
+
+async function displayTasks(){
   const tasksPlace = document.querySelector("#tasksPlace");
   let output = ``;
+  const tasks = await getTasks();
   tasks.map(i => {
     output +=`
     <div class="task" draggable="true" ondragstart="drag(event)" id="task-1">
