@@ -237,6 +237,11 @@ function drop(ev) {
   var data = ev.dataTransfer.getData("text");
   var task = document.getElementById(data);
   var column = ev.target;
+
+  // Ensure the drop target is not inside a task (not a nested task)
+  if (column.classList.contains('task') || !column.classList.contains('column')) {
+    return;
+  }
   // const startedField = task.querySelector('.time');
   const taskId = task.id.split('-').slice(1).join('-');
   let newColumn = column.id;
