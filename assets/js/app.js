@@ -90,8 +90,11 @@ async function addTask() {
     const taskBody =  document.querySelector("#taskDescription").value;
     const task = {
       title: taskTitle,        // Your task title
-      description: taskBody
+      description: taskBody,
+      column: "todo"
     };
+
+    console.log(task)
     const titleIsUnique = await isUniqueTitle(taskTitle);
 
  
@@ -159,33 +162,52 @@ async function addTask() {
 }
 
 
+function getFormattedTimeStamp(timeStamp) {
+  const splits = timeStamp.split("T")[0].split("-");
+  return `${splits[2]}-${splits[1]}-${splits[0]}`
+}
 
-async function displayTasks(){
-  const tasksPlace = document.querySelector("#tasksPlace");
-  let output = ``;
-  const tasks = await getTasks();
-  console.log(tasks)
-  tasks.map(i => {
-    output +=`
-    <div class="task" draggable="true" ondragstart="drag(event)" id="task-${i.id}">
-    <span class="delete" data-id="${i.id}">x</span>
-                <p><span>${i.title}</span></p>
-                <p>${i.description}</p>
-              <p class="time"></p>
-            </div>
-    `
-  });
-  tasksPlace.innerHTML = output;
 
-    // Add event listeners after rendering the tasks
-    const deleteButtons = document.querySelectorAll('.delete');
-    deleteButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const taskId = this.getAttribute('data-id');  // Get the task id
-        deleteTask(taskId);  // Call deleteTask with the id
+async function displayTasks() {
+  try {
+    const tasks = await getTasks(); // Fetch tasks
+    console.log(tasks);
+
+    // Clear existing tasks from each column before adding new ones
+    document.getElementById("todo").innerHTML = "<h2>To Do</h2>";
+    document.getElementById("in-progress").innerHTML = "<h2>In Progress</h2>";
+    document.getElementById("done").innerHTML = "<h2>Done</h2>";
+    document.getElementById("archived").innerHTML = "<h2>Archived</h2>";
+
+    tasks.forEach(task => {
+      const taskHTML = `
+        <div class="task" draggable="true" ondragstart="drag(event)" id="task-${task.id}">
+          <span class="delete" data-id="${task.id}">x</span>
+          <p><span>${task.title}</span></p>
+          <p>${task.description}</p>
+          <p class="time">${getFormattedTimeStamp(task.created_at)}</p>
+        </div>
+      `;
+
+      // Find the correct column
+      const columnElement = document.getElementById(task.column);
+      if (columnElement) {
+        columnElement.innerHTML += taskHTML; // Append task to the correct column
+      }
+    });
+
+    // Add event listeners after rendering tasks
+    document.querySelectorAll('.delete').forEach(button => {
+      button.addEventListener('click', function () {
+        const taskId = this.getAttribute('data-id'); // Get task id
+        deleteTask(taskId); // Call deleteTask with the id
       });
     });
+  } catch (error) {
+    console.error("Error displaying tasks:", error);
+  }
 }
+
 
 
 //drag and drop
@@ -215,27 +237,38 @@ function drop(ev) {
   var data = ev.dataTransfer.getData("text");
   var task = document.getElementById(data);
   var column = ev.target;
-  const startedField = task.querySelector('.time');
-  if (column.id === "in-progress") {
-    if (!startedField.textContent) {
-      startedField.textContent = `Started: ${setTimestamp()}`;
-    }
-  }
-
-  if (column.id === "done") {
-    if (!startedField.textContent) {
-      startedField.textContent = `Finished: ${setTimestamp()}`;
-    }
-  }
+  // const startedField = task.querySelector('.time');
+  const taskId = task.id.split('-').slice(1).join('-');
+  let newColumn = column.id;
 
 
-  if (column.id === "archived") {
-    if (!startedField.textContent) {
-      startedField.textContent = `Archived: ${setTimestamp()}`;
-    }
-  }
+   // Update the task's column and send a PUT request
+  updateTaskColumn(taskId, newColumn);
 
   column.appendChild(task);
+}
+
+async function updateTaskColumn(taskId, newColumn) {
+  try {
+    const response = await fetch('https://small-services-back-ends.vercel.app/api/task', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: taskId, column: newColumn }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update task column');
+    }
+
+    const data = await response.json();
+    console.log('Task column updated successfully:', data);
+
+    await displayTasks(); // Refresh the tasks list after updating column
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
 }
 
 displayTasks();
