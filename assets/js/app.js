@@ -57,11 +57,13 @@ function closeModal() {
  
 }
 
-function isUniqueTitle(title) {
+async function isUniqueTitle(title) {
+  const tasks = await getTasks();
   const titles = tasks.map(i => i.title);
+  console.log(titles, title, titles.includes(title))
   if(titles.includes(title)) {
     return false;
-  }
+  }  
   return true;
 }
 // function addTask(){
@@ -83,31 +85,78 @@ function isUniqueTitle(title) {
 // }
 
 async function addTask() {
-  const task = {
-    title: "New Task",        // Your task title
-    description: "This is the description of the new task"  // Your task description
-  };
-
   try {
-    const response = await fetch('https://small-services-back-ends.vercel.app/api/task', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',  // Ensure you're sending JSON
-      },
-      body: JSON.stringify(task),  // Convert the task object to a JSON string
-    });
+    const taskTitle = document.querySelector("#taskTitle").value;
+    const taskBody =  document.querySelector("#taskDescription").value;
+    const task = {
+      title: taskTitle,        // Your task title
+      description: taskBody
+    };
+    const titleIsUnique = await isUniqueTitle(taskTitle);
 
-    if (!response.ok) {
-      throw new Error('Failed to create task');
+ 
+    if(!taskTitle || !taskBody || !titleIsUnique) {
+      //TODO improve error
+      alert("Please input something and make sure it's unique!");
+ 
+    } else {
+      console.log(task);
+  
+      const response = await fetch('https://small-services-back-ends.vercel.app/api/task', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',  // Ensure you're sending JSON
+        },
+        body: JSON.stringify(task),  // Convert the task object to a JSON string
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create task');
+      }
+  
+      const data = await response.json();  // Parse the JSON response
+  
+      await displayTasks();
+      document.querySelector("#taskTitle").value="";
+      document.querySelector("#taskDescription").value="";
+      console.log('Task created successfully:', data);
+  
     }
-
-    const data = await response.json();  // Parse the JSON response
-    displayTasks();
-    console.log('Task created successfully:', data);
+    
   } catch (error) {
     console.error('Error:', error.message);
   }
 };
+
+ 
+  async function deleteTask(taskId) {
+  // console.log(taskId);
+  try {
+    if (!taskId) {
+      alert("Task ID is required!");
+      return;
+    }
+
+    const response = await fetch(`https://small-services-back-ends.vercel.app/api/task`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: taskId }), // Sending the ID in the request body
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete task');
+    }
+
+    const data = await response.json();
+    console.log('Task deleted successfully:', data);
+
+    await displayTasks(); // Refresh the tasks list after deletion
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+}
 
 
 
@@ -115,16 +164,27 @@ async function displayTasks(){
   const tasksPlace = document.querySelector("#tasksPlace");
   let output = ``;
   const tasks = await getTasks();
+  console.log(tasks)
   tasks.map(i => {
     output +=`
-    <div class="task" draggable="true" ondragstart="drag(event)" id="task-1">
+    <div class="task" draggable="true" ondragstart="drag(event)" id="task-${i.id}">
+    <span class="delete" data-id="${i.id}">x</span>
                 <p><span>${i.title}</span></p>
-                <p>${i.body}</p>
+                <p>${i.description}</p>
               <p class="time"></p>
             </div>
     `
   });
   tasksPlace.innerHTML = output;
+
+    // Add event listeners after rendering the tasks
+    const deleteButtons = document.querySelectorAll('.delete');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const taskId = this.getAttribute('data-id');  // Get the task id
+        deleteTask(taskId);  // Call deleteTask with the id
+      });
+    });
 }
 
 
