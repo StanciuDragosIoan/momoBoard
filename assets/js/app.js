@@ -2,42 +2,13 @@ const modalBtn = document.querySelector(
   '.open-modal'
 );
 const closeBtn = document.querySelector(".close");
-
-const getTasks = async () => {
-  try {
-    const response = await fetch('https://small-services-back-ends.vercel.app/api/task', {
-      method: 'GET',  // Use GET method to fetch data
-      headers: {
-        'Content-Type': 'application/json',  // Ensure the server knows we are expecting JSON
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch tasks');
-    }
-
-    const   responseData = await response.json();  // Parse the JSON response
-
-    console.log('Tasks fetched successfully:',responseData);
-
-    const { data }  = responseData;
-
-    return data;
-  } catch (error) {
-    console.error('Error:', error.message);
-    return [];
-  }
-};
-
- 
-
-closeBtn.addEventListener("click", closeModal);
-
-
-modalBtn.addEventListener('click', openModal);
-
 const addTaskBtn = document.querySelector(".input-add-btn");
+const spinner = document.querySelector("#loader");
+const endPoint = 'https://small-services-back-ends.vercel.app/api/task';
+closeBtn.addEventListener("click", closeModal);
+modalBtn.addEventListener('click', openModal);
 addTaskBtn.addEventListener("click", addTask);
+
 
 // Modal functions
 function openModal() {
@@ -63,6 +34,16 @@ async function isUniqueTitle(title) {
   }  
   return true;
 }
+
+// spinner
+function hideSpinner() {
+  spinner.style.display = "none";
+}
+
+function showSpinner() {
+  spinner.style.display = "block";
+}
+ 
  
 
 async function addTask() {
@@ -74,19 +55,14 @@ async function addTask() {
       description: taskBody,
       column: "todo"
     };
-
-    console.log(task)
     const titleIsUnique = await isUniqueTitle(taskTitle);
-
- 
     if(!taskTitle || !taskBody || !titleIsUnique) {
       //TODO improve error
       alert("Please input something and make sure it's unique!");
- 
     } else {
-      console.log(task);
-  
-      const response = await fetch('https://small-services-back-ends.vercel.app/api/task', {
+      showSpinner();
+      closeModal();
+      const response = await fetch(endPoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',  // Ensure you're sending JSON
@@ -101,42 +77,41 @@ async function addTask() {
       const data = await response.json();  // Parse the JSON response
   
       await displayTasks();
+      hideSpinner();
+      openModal();
       document.querySelector("#taskTitle").value="";
       document.querySelector("#taskDescription").value="";
       console.log('Task created successfully:', data);
-  
-    }
-    
+    }   
   } catch (error) {
     console.error('Error:', error.message);
   }
 };
 
+async function deleteTask(taskId) {
  
-  async function deleteTask(taskId) {
-  // console.log(taskId);
   try {
     if (!taskId) {
       alert("Task ID is required!");
       return;
     }
-
-    const response = await fetch(`https://small-services-back-ends.vercel.app/api/task`, {
+    showSpinner();
+    const response = await fetch(endPoint, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: taskId }), // Sending the ID in the request body
+      body: JSON.stringify({ id: taskId }),
     });
 
     if (!response.ok) {
       throw new Error('Failed to delete task');
     }
-
     const data = await response.json();
     console.log('Task deleted successfully:', data);
-
+    hideSpinner();
     await displayTasks(); // Refresh the tasks list after deletion
+  
   } catch (error) {
     console.error('Error:', error.message);
   }
@@ -144,81 +119,30 @@ async function addTask() {
 
  
 
-async function performTaskEdit(taskID, button) {
-  console.log("test123", taskID, button);
-
-  // Extracting task details from UI
-  const title = button.parentElement.children[2].children[0].innerHTML;
-  const description = button.parentElement.children[3].innerHTML;
-
-  console.log('title', title);
-  console.log('description', description); // ✅ Fixed incorrect logging
-
-  // Pre-fill the form with task details
-  const taskTitleInput = document.querySelector("#taskTitle");
-  const taskDescriptionInput = document.querySelector("#taskDescription");
-  const actionButton = document.querySelector(".input-add-btn");
-
-  taskTitleInput.value = title;
-  taskDescriptionInput.value = description;
-  actionButton.innerHTML = "Update Task";
-
-  // Remove any previous event listeners to prevent duplicates
-  actionButton.replaceWith(actionButton.cloneNode(true));
-  const newActionButton = document.querySelector(".input-add-btn");
-
-  // Add event listener for updating task
-  newActionButton.addEventListener("click", async function updateHandler() {
-    const updatedTitle = taskTitleInput.value;
-    const updatedDescription = taskDescriptionInput.value;
-
-    await updateTask(taskID, updatedTitle, updatedDescription); // ✅ Update the task
-
-    // Reset button to "Add Task" mode after update
-    newActionButton.innerHTML = "Add Task";
-
-    // Remove update event and restore "addTask" behavior
-    newActionButton.replaceWith(newActionButton.cloneNode(true));
-    document.querySelector(".input-add-btn").addEventListener("click", addTask);
-  });
-
-  openModal(); // Open the modal for editing
-}
 
 
-
-async function updateTask(id, title, description) {
- 
+async function getTasks() {
   try {
-    if (!id) {
-      alert("Task ID is required!");
-      return;
-    }
-
-    const response = await fetch(`https://small-services-back-ends.vercel.app/api/task`, {
-      method: 'PUT',
+    showSpinner();
+    const response = await fetch(endPoint, {
+      method: 'GET',   
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json',  
       },
-      body: JSON.stringify({ id, title, description }), // Sending the ID in the request body
     });
 
     if (!response.ok) {
-      throw new Error('Failed to delete task');
+      throw new Error('Failed to fetch tasks');
     }
 
-    const data = await response.json();
-    console.log('Task update successfully:', data);
+    const   responseData = await response.json(); 
 
-    document.querySelector("#taskTitle").value="";
-    document.querySelector("#taskDescription").value="";
-
-    document.querySelector(".input-add-btn").innerHTML = "Add Task";
-    document.querySelector(".input-add-btn").removeEventListener("click", updateTask);
-    document.querySelector(".input-add-btn").addEventListener("click", addTask);
-    await displayTasks(); // Refresh the tasks list after deletion
-  } catch (error) {
+    const { data }  = responseData;
+    hideSpinner();
+    return data;
+  } catch(err){
     console.error('Error:', error.message);
+    return [];
   }
 }
 
@@ -231,9 +155,7 @@ function getFormattedTimeStamp(timeStamp) {
 
 async function displayTasks() {
   try {
-    const tasks = await getTasks(); // Fetch tasks
-    console.log(tasks);
-
+    const tasks = await getTasks();  
     // Clear existing tasks from each column before adding new ones
     document.getElementById("todo").innerHTML = "<h2>To Do</h2>";
     document.getElementById("in-progress").innerHTML = "<h2>In Progress</h2>";
@@ -278,8 +200,6 @@ async function displayTasks() {
   }
 }
 
-
-
 //drag and drop
 // Allow dragging the task
 function drag(ev) {
@@ -291,22 +211,11 @@ function allowDrop(ev) {
   ev.preventDefault();
 }
 
-
-function setTimestamp() {
-  const now = new Date();
-  const day = now.getDate().toString().padStart(2, '0');
-  const month = (now.getMonth() + 1).toString().padStart(2, '0');
-  const year = now.getFullYear();
-  const hours = now.getHours().toString().padStart(2, '0');
-  const minutes = now.getMinutes().toString().padStart(2, '0');
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
-}
-// When a task is dropped
-function drop(ev) {
-  ev.preventDefault();
-  var data = ev.dataTransfer.getData("text");
+function drop(e) {
+  e.preventDefault();
+  var data = e.dataTransfer.getData("text");
   var task = document.getElementById(data);
-  var column = ev.target;
+  var column = e.target;
 
   // Ensure the drop target is not inside a task (not a nested task)
   if (column.classList.contains('task') || !column.classList.contains('column')) {
@@ -325,7 +234,8 @@ function drop(ev) {
 
 async function updateTaskColumn(taskId, newColumn) {
   try {
-    const response = await fetch('https://small-services-back-ends.vercel.app/api/task', {
+    showSpinner();
+    const response = await fetch(endPoint, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -339,11 +249,83 @@ async function updateTaskColumn(taskId, newColumn) {
 
     const data = await response.json();
     console.log('Task column updated successfully:', data);
-
+    hideSpinner();
     await displayTasks(); // Refresh the tasks list after updating column
   } catch (error) {
     console.error('Error:', error.message);
   }
 }
 
-displayTasks();
+async function performTaskEdit(taskID, button) {
+  // Extracting task details from UI
+  const title = button.parentElement.children[2].children[0].innerHTML;
+  const description = button.parentElement.children[3].innerHTML;
+
+
+  // Pre-fill the form with task details
+  const taskTitleInput = document.querySelector("#taskTitle");
+  const taskDescriptionInput = document.querySelector("#taskDescription");
+  const actionButton = document.querySelector(".input-add-btn");
+
+  taskTitleInput.value = title;
+  taskDescriptionInput.value = description;
+  actionButton.innerHTML = "Update Task";
+
+  // Remove any previous event listeners to prevent duplicates
+  actionButton.replaceWith(actionButton.cloneNode(true));
+  const newActionButton = document.querySelector(".input-add-btn");
+
+  // Add event listener for updating task
+  newActionButton.addEventListener("click", async function updateHandler() {
+    const updatedTitle = taskTitleInput.value;
+    const updatedDescription = taskDescriptionInput.value;
+    await updateTask(taskID, updatedTitle, updatedDescription); // ✅ Update the task
+    newActionButton.removeEventListener("click", updateHandler);
+    newActionButton.innerHTML = "Add Task";
+    newActionButton.addEventListener("click", addTask);
+  });
+
+  openModal(); // Open the modal for editing
+}
+
+async function updateTask(id, title, description) {
+ 
+  try {
+    if (!id) {
+      alert("Task ID is required!");
+      return;
+    }
+    closeModal();
+    showSpinner();
+    const response = await fetch(endPoint, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id, title, description }), // Sending the ID in the request body
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete task');
+    }
+
+    const data = await response.json();
+    console.log('Task update successfully:', data);
+
+    document.querySelector("#taskTitle").value="";
+    document.querySelector("#taskDescription").value="";
+
+    document.querySelector(".input-add-btn").innerHTML = "Add Task";
+    document.querySelector(".input-add-btn").removeEventListener("click", updateTask);
+    document.querySelector(".input-add-btn").addEventListener("click", addTask);
+    hideSpinner();
+    openModal();
+    await displayTasks(); // Refresh the tasks list after deletion
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+}
+
+
+
+ displayTasks();

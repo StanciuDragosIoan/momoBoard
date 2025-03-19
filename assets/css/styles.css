@@ -243,6 +243,26 @@ body {
   width: 100%;          
   margin: 0 auto;
 }
+ 
+#loader {
+  width: 150px;
+  height: 150px;
+  border: 15px solid #331818b9;  
+  border-top: 15px solid #3498db;  
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  position:relative;
+  position:relative;
+  top:50vh;
+  z-index:2;
+  display:none;
+}
+
+ 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
 /* Responsive Layout */
 @media screen and (max-width: 768px) {
